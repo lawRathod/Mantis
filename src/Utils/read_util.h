@@ -1,12 +1,13 @@
 #include<iostream>
 #include<string>
-#include<glob.h>
 #include<fstream>
 #include<vector>
 #include<sstream>
 
 
 class raster{
+	void * p;
+
 	void getfiles(){
 		std::cout<<".hdr file (full path)\n";
 		std::cin>>hdrfile;
@@ -72,17 +73,15 @@ class raster{
 	}
 
 	template<typename T>
-	auto* read_binary_internal(T *p, T q){
+	void* read_bin_internal(){
 		p = new T [bands * samples * lines];
-
 		std::ifstream bin(datfile, std::ios::out | std::ios::binary);
 
 		int count = 0;
 		for(int i=0;i<bands; i++){
 			for(int j=0;j<samples; j++){
 				for(int k=0;k<lines;k++){
-					bin.read((char *) &q, sizeof(q));
-					*(p + i*samples*lines + j*lines + k) = q;
+					bin.read((char *) &*(static_cast<T*>(p) + i*samples*lines + j*lines + k) , sizeof(static_cast<T*>(p)));
 					count++;
 				}
 			}
@@ -95,24 +94,25 @@ class raster{
 
 	}
 
-	auto* read_bin(){
+	void* read_bin(){
 		if(datatype == 2){
-			int16_t *p;
-			int16_t q;
-			return read_binary_internal<int16_t>(p, q);
-		} else if( datatype == 1 ){
-			uint8_t *p;
-			uint8_t q;
-			return read_binary_internal<uint8_t>(p, q);
+			return read_bin_internal<int16_t>();
+		}
+		if(datatype ==1 ){
+			return read_bin_internal<uint8_t>();
 		}
 
+
+		return NULL;
 	}
 
-	static void print_data_sample(int16_t* data, int band_from_hdr, int sample_num, int total_lines){
+
+	template<typename T>
+	void print_data_sample_internal(void* data, int band_from_hdr, int sample_num){
 		for(int i=0;i<band_from_hdr; i++){
 			for(int j=0;j<sample_num; j++){
-				for(int k=0;k<total_lines;k++){
-					std::cout<<*(data + i*sample_num*total_lines + j*total_lines + k)<<" ";
+				for(int k=0;k<lines;k++){
+					std::cout<<*(static_cast<T*>(data) + i*sample_num*lines + j*lines + k)<<" ";
 				}
 				std::cout<<std::endl;
 			}
@@ -120,19 +120,14 @@ class raster{
 		}
 	}
 
+	void print_data_sample(void* data, int band_from_hdr, int sample_num){
+		if(datatype==2){
+			print_data_sample_internal<int16_t>(data, band_from_hdr, sample_num);
+		}else if (datatype==1){
+			print_data_sample_internal<uint8_t>(data, band_from_hdr, sample_num);
+		}
+	}
+
 };
 
-
-int main() {
-
-	raster *core = new raster("CupriteAVIRISSubset.hdr", "CupriteAVIRISSubset.dat");
-	auto *data = core->read_bin();
-	
-	raster::print_data_sample(data, 10,10, core->lines);
-
-	std::cout<<std::endl;
-
-	return 0;
-
-}
 

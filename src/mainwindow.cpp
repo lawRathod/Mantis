@@ -21,14 +21,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::open()
 {
+    qWarning()<<"opening dialog";
     opendialog->setModal(true);
     opendialog->exec();
 }
 
 void MainWindow::openImage(QString hdrPath, QString datPath)
 {
-    Utils::raster *r = new Utils::raster(hdrPath.toStdString(), datPath.toStdString());
-
-    QMessageBox msg;
-       msg.setText(r->get_metadata("brands"));
+    qWarning()<<"opened";
+      Utils::raster *r = new Utils::raster(hdrPath.toStdString(), datPath.toStdString());
+      qWarning()<<r->get_metadata("bands");
 }
+
+void drawPointChart() {
+
+}
+

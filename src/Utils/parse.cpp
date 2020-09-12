@@ -80,10 +80,7 @@ namespace Utils {
 				}
 			}
 		}
-		std::cout<<count<<"\n";
-
 		bin.close();
-
 		return p;
 
 	}
@@ -95,34 +92,12 @@ namespace Utils {
 		if(metadata.at("datatype") ==1 ){
 			return read_bin_internal<uint8_t>();
 		}
-
-
 		return NULL;
 	}
 
-	template<typename T>
-	void raster::print_data_sample_internal(void* data, int band_from_hdr, int sample_num){
-		for(int i=0;i<band_from_hdr; i++){
-			for(int j=0;j<sample_num; j++){
-				for(int k=0;k<metadata.at("lines");k++){
-					std::cout<<*(static_cast<T*>(data) + i*sample_num*metadata.at("lines") + j*metadata.at("lines") + k)<<" ";
-				}
-				std::cout<<std::endl;
-			}
-			std::cout<<std::endl;
-		}
-	}
 
-	void raster::print_data_sample(void* data, int band_from_hdr, int sample_num){
-		if(metadata.at("datatype")==2){
-			print_data_sample_internal<int16_t>(data, band_from_hdr, sample_num);
-		}else if (metadata.at("datatype")==1){
-			print_data_sample_internal<uint8_t>(data, band_from_hdr, sample_num);
-		}
-	}
-
-	void* raster::get_metadata(std::string key){
-		return & metadata[key];
+	int raster::get_metadata(std::string key){
+		return metadata[key];
 	}
 
 }

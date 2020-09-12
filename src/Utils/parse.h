@@ -15,7 +15,7 @@ namespace Utils {
 			void* read_bin();
 			template<typename T> void print_data_sample_internal(void*, int, int);
 			void print_data_sample(void*, int, int);
-			void* get_metadata(std::string);
+			int raster::get_metadata(std::string);
 
 		private:
 			void * p;

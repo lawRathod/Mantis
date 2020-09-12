@@ -26,7 +26,8 @@ private:
     OpenDialog *opendialog;
     int imageOption = 1;
     QGraphicsScene *graphics;
-    void drawAggregateChart(int *, int, int, int);
+    template <typename T>
+    void drawAggregateChart(void *, int, int, int);
 
 private slots:
     void open();

@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QSignalMapper>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "opendialog.h"
 

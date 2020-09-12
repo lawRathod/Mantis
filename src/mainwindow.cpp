@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "./Utils/parse.cpp"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -25,5 +27,8 @@ void MainWindow::open()
 
 void MainWindow::openImage(QString hdrPath, QString datPath)
 {
-    //pass to read util
+    Utils::raster *r = new Utils::raster(hdrPath.toStdString(), datPath.toStdString());
+
+    QMessageBox msg;
+       msg.setText(r->get_metadata("brands"));
 }

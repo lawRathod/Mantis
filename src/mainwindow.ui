@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1293</width>
-    <height>616</height>
+    <width>841</width>
+    <height>483</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,6 +57,33 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Metadata</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Bands</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QGraphicsView" name="graphicsView_2"/>
         </item>
        </layout>
@@ -70,7 +97,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1293</width>
+     <width>841</width>
      <height>21</height>
     </rect>
    </property>

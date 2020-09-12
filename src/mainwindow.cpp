@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
 #include "./Utils/parse.cpp"
 
 MainWindow::MainWindow(QWidget *parent)

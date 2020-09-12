@@ -1,5 +1,6 @@
 #include"parse.h"
 namespace Utils {
+
 	raster::raster(std::string hdrfile, std::string datfile){
 		this->hdrfile = hdrfile;
 		this->datfile = datfile;
@@ -12,92 +13,64 @@ namespace Utils {
 		header.open(hdrfile);
 		std::string line;
 
-		int i = 12;
-		while(i--){
+		while(header){
 			getline(header, line);
-
-			if(line.find("samples")!= -1){
-				std::string s = line.substr(line.find("=")+1);
-				std::stringstream ss(s);
-				int t;
-				ss>>t;
-				metadata["samples"] = t;
-			}
-			if(line.find("lines")!= -1){
-				std::string s = line.substr(line.find("=")+1);
-				std::stringstream ss(s);
-				int t;
-				ss>>t;
-				metadata.insert(std::pair<std::string, int>("lines", t));
-				metadata["lines"] = t;
-			}
-			if(line.find("bands")!= -1){
-				std::string s = line.substr(line.find("=")+1);
-				std::stringstream ss(s);
-				int t;
-				ss>>t;
-				metadata.insert(std::pair<std::string, int>("bands", t));
-				metadata["bands"] = t;
-			}
-			if(line.find("data type")!= -1){
-				std::string s = line.substr(line.find("=")+1);
-				std::stringstream ss(s);
-				int t;
-				ss>>t;
-				metadata["datatype"] = t;
-			}
-			if(line.find("header_offset")!= -1){
-				std::string s = line.substr(line.find("=")+1);
-				std::stringstream ss(s);
-				int t;
-				ss>>t;
-				metadata["header_offset"] = t;
-			;
-			metadata.insert(std::pair<std::string, int>("header_offset",t));
-			}
-			if(line.find("byte order")!= -1){
-				std::string s = line.substr(line.find("=")+1);
-				std::stringstream ss(s);
-				int t;
-				ss >> t;
-				metadata["byte_order"] = t;
+			int equal_pos = line.find("=");
+			if(equal_pos > -1){
+				std::string key =line.substr(0, line.find("=")-1);
+				std::string value = line.substr(equal_pos + 2);
+				metadata.insert(std::pair<std::string, std::string>(key, value));
 			}
 		}
+
 		header.close();
 	}
 
 	template<typename T>
 	void* raster::read_bin_internal(){
-		p = new T [metadata.at("bands") * metadata.at("samples") * metadata.at("lines")];
+		std::stringstream *ss;
+		ss = new std::stringstream(metadata.at("bands  "));
+		int bands;
+		*ss >> bands;
+		ss = new std::stringstream(metadata.at("samples"));
+		int samples;
+		*ss >> samples;
+		ss = new std::stringstream(metadata.at("lines  "));
+		int lines;
+		*ss >> lines;
+
+		p = new T [bands * lines * samples];
 		std::ifstream bin(datfile, std::ios::out | std::ios::binary);
 
 		int count = 0;
-		for(int i=0;i<metadata.at("bands"); i++){
-			for(int j=0;j<metadata.at("samples"); j++){
-				for(int k=0;k<metadata.at("lines");k++){
-					bin.read((char *) &*(static_cast<T*>(p) + i*metadata.at("samples")*metadata.at("lines") + j*metadata.at("lines") + k) , sizeof(static_cast<T*>(p)));
+		for(int i=0;i<bands; i++){
+			for(int j=0;j<samples; j++){
+				for(int k=0;k<lines;k++){
+					bin.read((char *) &*(static_cast<T*>(p) + i*samples*lines + j*lines + k), sizeof(static_cast<T*>(p)));
 					count++;
 				}
 			}
 		}
+
 		bin.close();
+
 		return p;
 
 	}
 
 	void* raster::read_bin(){
-		if(metadata.at("datatype") == 2){
+		if(metadata.at("data type").compare("2\r") == 0){
 			return read_bin_internal<int16_t>();
 		}
-		if(metadata.at("datatype") ==1 ){
+		if(metadata.at("data type").compare("1\r") == 0){
 			return read_bin_internal<uint8_t>();
 		}
 		return NULL;
 	}
 
 
-	int raster::get_metadata(std::string key){
-		return metadata[key];
+	std::string raster::get_metadata(std::string key){
+		return metadata.at(key);
 	}
 
 }

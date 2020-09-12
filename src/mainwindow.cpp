@@ -6,7 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    createActions();
+    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
+
+     opendialog = new OpenDialog();
+     connect(opendialog, SIGNAL(pathChanged(QString, QString)), this, SLOT(openImage(QString, QString)));
 }
 
 MainWindow::~MainWindow()
@@ -14,17 +17,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::createActions()
-{
-    pSignalMapper = new QSignalMapper(this);
-    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
-}
-
 void MainWindow::open()
 {
-    QString fileName = QFileDialog::getOpenFileName(this);
-    if (!fileName.isEmpty()) {
-        // do something
-        qDebug() << "works";
-    }
+    opendialog->setModal(true);
+    opendialog->exec();
+}
+
+void MainWindow::openImage(QString hdrPath, QString datPath)
+{
+    //pass to read util
 }

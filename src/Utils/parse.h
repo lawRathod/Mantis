@@ -1,7 +1,7 @@
 #include<iostream>
 #include<string>
 #include<fstream>
-#include<vector>
+#include<unordered_map>
 #include<sstream>
 
 
@@ -16,7 +16,7 @@ class raster{
 	}
 
 	public: 
-	int samples, lines, bands, datatype, header_offset, byteorder;
+	std::unordered_map<std::string, int> metadata;
 	std::string datfile, hdrfile;
 	raster(){
 		getfiles();
@@ -25,10 +25,10 @@ class raster{
 	raster(std::string hdrfile, std::string datfile){
 		this->hdrfile = hdrfile;
 		this->datfile = datfile;
-		get_metadata();
+		read_metadata();
 	}
 
-	void get_metadata(){
+	void read_metadata(){
 
 		std::ifstream header;
 		header.open(hdrfile);
@@ -41,32 +41,48 @@ class raster{
 			if(line.find("samples")!= -1){
 				std::string s = line.substr(line.find("=")+1);
 				std::stringstream ss(s);
-				ss >> samples;
+				int t;
+				ss>>t;
+				metadata["samples"] = t;
 			}
 			if(line.find("lines")!= -1){
 				std::string s = line.substr(line.find("=")+1);
 				std::stringstream ss(s);
-				ss >> lines;
+				int t;
+				ss>>t;
+				metadata.insert(std::pair<std::string, int>("lines", t));
+				metadata["lines"] = t;
 			}
 			if(line.find("bands")!= -1){
 				std::string s = line.substr(line.find("=")+1);
 				std::stringstream ss(s);
-				ss >> bands;
+				int t;
+				ss>>t;
+				metadata.insert(std::pair<std::string, int>("bands", t));
+				metadata["bands"] = t;
 			}
 			if(line.find("data type")!= -1){
 				std::string s = line.substr(line.find("=")+1);
 				std::stringstream ss(s);
-				ss >> datatype;
+				int t;
+				ss>>t;
+				metadata["datatype"] = t;
 			}
 			if(line.find("header_offset")!= -1){
 				std::string s = line.substr(line.find("=")+1);
 				std::stringstream ss(s);
-				ss >> header_offset;
+				int t;
+				ss>>t;
+				metadata["header_offset"] = t;
+			;
+			metadata.insert(std::pair<std::string, int>("header_offset",t));
 			}
 			if(line.find("byte order")!= -1){
 				std::string s = line.substr(line.find("=")+1);
 				std::stringstream ss(s);
-				ss >> byteorder;
+				int t;
+				ss >> t;
+				metadata["byte_order"] = t;
 			}
 		}
 		header.close();
@@ -74,14 +90,14 @@ class raster{
 
 	template<typename T>
 	void* read_bin_internal(){
-		p = new T [bands * samples * lines];
+		p = new T [metadata.at("bands") * metadata.at("samples") * metadata.at("lines")];
 		std::ifstream bin(datfile, std::ios::out | std::ios::binary);
 
 		int count = 0;
-		for(int i=0;i<bands; i++){
-			for(int j=0;j<samples; j++){
-				for(int k=0;k<lines;k++){
-					bin.read((char *) &*(static_cast<T*>(p) + i*samples*lines + j*lines + k) , sizeof(static_cast<T*>(p)));
+		for(int i=0;i<metadata.at("bands"); i++){
+			for(int j=0;j<metadata.at("samples"); j++){
+				for(int k=0;k<metadata.at("lines");k++){
+					bin.read((char *) &*(static_cast<T*>(p) + i*metadata.at("samples")*metadata.at("lines") + j*metadata.at("lines") + k) , sizeof(static_cast<T*>(p)));
 					count++;
 				}
 			}
@@ -95,10 +111,10 @@ class raster{
 	}
 
 	void* read_bin(){
-		if(datatype == 2){
+		if(metadata.at("datatype") == 2){
 			return read_bin_internal<int16_t>();
 		}
-		if(datatype ==1 ){
+		if(metadata.at("datatype") ==1 ){
 			return read_bin_internal<uint8_t>();
 		}
 
@@ -111,8 +127,8 @@ class raster{
 	void print_data_sample_internal(void* data, int band_from_hdr, int sample_num){
 		for(int i=0;i<band_from_hdr; i++){
 			for(int j=0;j<sample_num; j++){
-				for(int k=0;k<lines;k++){
-					std::cout<<*(static_cast<T*>(data) + i*sample_num*lines + j*lines + k)<<" ";
+				for(int k=0;k<metadata.at("lines");k++){
+					std::cout<<*(static_cast<T*>(data) + i*sample_num*metadata.at("lines") + j*metadata.at("lines") + k)<<" ";
 				}
 				std::cout<<std::endl;
 			}
@@ -121,11 +137,15 @@ class raster{
 	}
 
 	void print_data_sample(void* data, int band_from_hdr, int sample_num){
-		if(datatype==2){
+		if(metadata.at("datatype")==2){
 			print_data_sample_internal<int16_t>(data, band_from_hdr, sample_num);
-		}else if (datatype==1){
+		}else if (metadata.at("datatype")==1){
 			print_data_sample_internal<uint8_t>(data, band_from_hdr, sample_num);
 		}
+	}
+
+	std::unordered_map<std::string, int> get_metadata(){
+		return metadata;
 	}
 
 };

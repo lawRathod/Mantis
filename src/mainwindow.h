@@ -6,6 +6,7 @@
 #include <QSignalMapper>
 #include <QFileDialog>
 
+#include "opendialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,10 +22,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    void createActions();
-     QSignalMapper *pSignalMapper;
+    OpenDialog *opendialog;
 
 private slots:
     void open();
+    void openImage(QString, QString);
 };
 #endif // MAINWINDOW_H

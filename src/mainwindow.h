@@ -6,7 +6,7 @@
 #include <QSignalMapper>
 #include <QFileDialog>
 #include <QMessageBox>
-
+#include <QGraphicsScene>
 #include "opendialog.h"
 
 QT_BEGIN_NAMESPACE
@@ -24,6 +24,8 @@ public:
 private:
     Ui::MainWindow *ui;
     OpenDialog *opendialog;
+    int imageOption = 1;
+    QGraphicsScene *graphics;
 
 private slots:
     void open();

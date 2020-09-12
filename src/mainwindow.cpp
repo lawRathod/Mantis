@@ -3,8 +3,6 @@
 
 #include "./Utils/parse.cpp"
 
-#include <boost/numeric/ublas/tensor.hpp>
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -36,9 +34,10 @@ void MainWindow::openImage(QString hdrPath, QString datPath)
       Utils::raster *r = new Utils::raster(hdrPath.toStdString(), datPath.toStdString());
       qWarning()<<r->get_metadata("bands");
 
+
 }
 
-void MainWindow::drawAggregateChart(tensor<double> data, int x, int y, int b) {
+void MainWindow::drawAggregateChart(int * data, int x, int y, int band) {
     if (imageOption == 1) {
         int r=1, g=20, b=80;
         QImage img(x, y, QImage::Format_RGB888);
@@ -51,7 +50,6 @@ void MainWindow::drawAggregateChart(tensor<double> data, int x, int y, int b) {
 
           graphics->addPixmap(QPixmap::fromImage(img));
           ui->graphicsView->setScene(graphics);
-
     }
 }
 

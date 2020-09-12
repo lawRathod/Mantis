@@ -1,4 +1,7 @@
 #include"parse.h"
+#include <iterator>
+#include<regex>
+
 namespace Utils {
 
 	raster::raster(std::string hdrfile, std::string datfile){
@@ -18,7 +21,9 @@ namespace Utils {
 			int equal_pos = line.find("=");
 			if(equal_pos > -1){
 				std::string key =line.substr(0, line.find("=")-1);
+				key = std::regex_replace(key.c_str(), std::regex("^ +| +$|( ) +"), "$1");
 				std::string value = line.substr(equal_pos + 2);
+				value = std::regex_replace(value.c_str(), std::regex("^ +| +$|( ) +"), "$1");
 				metadata.insert(std::pair<std::string, std::string>(key, value));
 			}
 		}
@@ -29,13 +34,13 @@ namespace Utils {
 	template<typename T>
 	void* raster::read_bin_internal(){
 		std::stringstream *ss;
-		ss = new std::stringstream(metadata.at("bands  "));
+		ss = new std::stringstream(metadata.at("bands"));
 		int bands;
 		*ss >> bands;
 		ss = new std::stringstream(metadata.at("samples"));
 		int samples;
 		*ss >> samples;
-		ss = new std::stringstream(metadata.at("lines  "));
+		ss = new std::stringstream(metadata.at("lines"));
 		int lines;
 		*ss >> lines;
 
